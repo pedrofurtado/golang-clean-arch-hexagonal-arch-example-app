@@ -7,37 +7,22 @@ import (
 	"net/http"
 
 	// Infra - HTTP Routers
-	http_router_chi "my-app/src/infra/http_routers/chi"
-	http_router_gorilla_mux "my-app/src/infra/http_routers/gorilla_mux"
-	http_router_julienschmidt_httprouter "my-app/src/infra/http_routers/julienschmidt_httprouter"
+	infra_http_router "my-app/src/infra/http_routers"
+
+	// Infra - UUID Generator
+	infra_uuid_generator "my-app/src/infra/uuid_generators"
 )
 
 const APP_PORT = 80
 
-var INFRA_ADAPTERS = map[string]string{
-	// Possible values: chi | gorilla_mux | julienschmidt_httprouter
-	"HTTP_ROUTER": "gorilla_mux",
-}
-
 func main() {
+	// Init - Log
 	fmt.Printf("App listening on port %v | Golang version %v | Now is %s\n", APP_PORT, runtime.Version(), time.Now().String())
 
-	// Init infra dependencies
-	router := initHTTPRouter()
+	// Init - Infra dependencies
+	infra_uuid_generator := infra_uuid_generator.Init()
+	router := infra_http_router.Init(infra_uuid_generator)
 
 	// Init app
 	http.ListenAndServe(fmt.Sprintf(":%d", APP_PORT), router)
-}
-
-func initHTTPRouter() http.Handler {
-	switch INFRA_ADAPTERS["HTTP_ROUTER"] {
-		case "chi":
-			return http_router_chi.Init()
-		case "gorilla_mux":
-			return http_router_gorilla_mux.Init()
-		case "julienschmidt_httprouter":
-			return http_router_julienschmidt_httprouter.Init()
-		default:
-			return nil
-	}
 }
