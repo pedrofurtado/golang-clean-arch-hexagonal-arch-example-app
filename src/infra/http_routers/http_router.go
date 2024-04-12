@@ -2,25 +2,27 @@ package http_routers
 
 import (
 	"net/http"
+	"os"
+	"fmt"
 
-	infra_adapters "my-app/src/config/infra_adapters"
+	infraUUIDGenerator "my-app/src/infra/uuid_generators"
 
-	infra_uuid_generator "my-app/src/infra/uuid_generators"
-
-	http_router_chi "my-app/src/infra/http_routers/chi"
-	http_router_gorilla_mux "my-app/src/infra/http_routers/gorilla_mux"
-	http_router_julienschmidt_httprouter "my-app/src/infra/http_routers/julienschmidt_httprouter"
+	httpRouterChi "my-app/src/infra/http_routers/chi"
+	httpRouterGorillaMux "my-app/src/infra/http_routers/gorilla_mux"
+	httpRouterJulienschmidtHTTPRouter "my-app/src/infra/http_routers/julienschmidt_httprouter"
 )
 
-func Init(uuid_generator infra_uuid_generator.GenericUUIDGenerator) http.Handler {
-	switch infra_adapters.GetAdapters()["HTTP_ROUTER"] {
+func Init(uuid_generator infraUUIDGenerator.GenericUUIDGenerator) http.Handler {
+	switch os.Getenv("APP_ADAPTER_HTTP_ROUTER") {
 		case "chi":
-			return http_router_chi.Init(uuid_generator)
+			return httpRouterChi.Init(uuid_generator)
 		case "gorilla_mux":
-			return http_router_gorilla_mux.Init(uuid_generator)
+			return httpRouterGorillaMux.Init(uuid_generator)
 		case "julienschmidt_httprouter":
-			return http_router_julienschmidt_httprouter.Init(uuid_generator)
+			return httpRouterJulienschmidtHTTPRouter.Init(uuid_generator)
 		default:
-			return nil
+			err := "Must be defined a adapter for http router"
+			fmt.Println(err)
+			panic(err)
 	}
 }

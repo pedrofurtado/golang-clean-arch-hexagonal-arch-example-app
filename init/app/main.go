@@ -5,24 +5,36 @@ import (
 	"fmt"
 	"runtime"
 	"net/http"
+	"os"
+	"strconv"
 
-	// Infra - HTTP Routers
-	infra_http_router "my-app/src/infra/http_routers"
+	productRepository "my-app/src/domain/repositories/products"
+	productInputDTO "my-app/src/domain/input_dtos/products"
 
-	// Infra - UUID Generator
-	infra_uuid_generator "my-app/src/infra/uuid_generators"
+	infraDatabaseDriver "my-app/src/infra/database_drivers"
+	infraHTTPRouter "my-app/src/infra/http_routers"
+	infraUUIDGenerator "my-app/src/infra/uuid_generators"
 )
 
-const APP_PORT = 80
-
 func main() {
-	// Init - Log
-	fmt.Printf("App listening on port %v | Golang version %v | Now is %s\n", APP_PORT, runtime.Version(), time.Now().String())
+	port, err := strconv.Atoi(os.Getenv("APP_PORT"))
 
-	// Init - Infra dependencies
-	infra_uuid_generator := infra_uuid_generator.Init()
-	router := infra_http_router.Init(infra_uuid_generator)
+	if err != nil {
+		fmt.Println("Error when convert the env APP_PORT into integer. Error %v", err)
+		panic(err)
+	}
 
-	// Init app
-	http.ListenAndServe(fmt.Sprintf(":%d", APP_PORT), router)
+	fmt.Printf("App listening on port %v | Golang version %v | Now is %s\n", port, runtime.Version(), time.Now().String())
+
+	////////////
+	db := infraDatabaseDriver.Init()
+	productInputDTO := productInputDTO.ProductInputDTO{Identifier: 1, FullName: "John smith", StateName: "ready",}
+	productRepository := productRepository.NewProductRepository(db)
+	productRepository.Insert(productInputDTO)
+	////////////
+
+	uuidGenerator := infraUUIDGenerator.Init()
+	router := infraHTTPRouter.Init(uuidGenerator)
+
+	http.ListenAndServe(fmt.Sprintf(":%d", port), router)
 }

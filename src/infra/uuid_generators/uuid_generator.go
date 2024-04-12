@@ -1,11 +1,11 @@
 package uuid_generators
 
 import (
-	infra_adapters "my-app/src/config/infra_adapters"
+	"os"
+	"fmt"
 
-	uuid_generator_google_uuid "my-app/src/infra/uuid_generators/google_uuid"
-	uuid_generator_gofrs_uuid "my-app/src/infra/uuid_generators/gofrs_uuid"
-	uuid_generator_empty_uuid "my-app/src/infra/uuid_generators/empty_uuid"
+	uuidGeneratorGoogleUUID "my-app/src/infra/uuid_generators/google_uuid"
+	uuidGeneratorGofrsUUID "my-app/src/infra/uuid_generators/gofrs_uuid"
 )
 
 type GenericUUIDGenerator interface{
@@ -13,12 +13,14 @@ type GenericUUIDGenerator interface{
 }
 
 func Init() GenericUUIDGenerator {
-	switch infra_adapters.GetAdapters()["UUID_GENERATOR"] {
+	switch os.Getenv("APP_ADAPTER_UUID_GENERATOR") {
 		case "google_uuid":
-			return uuid_generator_google_uuid.Init()
+			return uuidGeneratorGoogleUUID.Init()
 		case "gofrs_uuid":
-		return uuid_generator_gofrs_uuid.Init()
+			return uuidGeneratorGofrsUUID.Init()
 		default:
-			return uuid_generator_empty_uuid.Init()
+			err := "Must be defined a adapter for uuid generator"
+			fmt.Println(err)
+			panic(err)
 	}
 }
