@@ -1,15 +1,15 @@
 version: '3'
 
 services:
-  # db_in_postgres:
-  #   restart: always
-  #   image: postgres:11-alpine
-  #   environment:
-  #     POSTGRES_USER: my_db_user
-  #     POSTGRES_DB: my_db
-  #     POSTGRES_PASSWORD: my_db_password
-  #   volumes:
-  #     - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+  db_in_postgres:
+    restart: always
+    image: postgres:11-alpine
+    environment:
+      POSTGRES_USER: my_db_user
+      POSTGRES_DB: my_db
+      POSTGRES_PASSWORD: my_db_password
+    volumes:
+      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
   db_in_mysql:
     restart: always
     image: mysql:5.7
@@ -30,10 +30,11 @@ services:
       APP_ADAPTER_HTTP_ROUTER: gorilla_mux # Possible values: chi | gorilla_mux | julienschmidt_httprouter
       APP_ADAPTER_UUID_GENERATOR: gofrs_uuid # Possible values: google_uuid | gofrs_uuid (if blank: empty_uuid)
       APP_ADAPTER_DATABASE_DRIVER: mysql # Possible values: postgres | mysql
-      DATABASE_HOST: db_in_mysql
+      DATABASE_HOST: "db_in_mysql"
       DATABASE_PORT: 3306
       DATABASE_NAME: my_db
       DATABASE_USER: my_db_user
       DATABASE_PASSWORD: my_db_password
+      DATABASE_SSLMODE: disable
     ports:
       - 3000:80

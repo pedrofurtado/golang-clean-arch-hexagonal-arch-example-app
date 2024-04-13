@@ -6,6 +6,7 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 )
 
 type SqlDatabase struct {
@@ -35,6 +36,8 @@ func newDatabase() (*sql.DB) {
 	switch databaseDriver {
 		case "mysql":
 			connectionUrl = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("DATABASE_USER"), os.Getenv("DATABASE_PASSWORD"), os.Getenv("DATABASE_HOST"), os.Getenv("DATABASE_PORT"), os.Getenv("DATABASE_NAME"))
+		case "postgres":
+			connectionUrl = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", os.Getenv("DATABASE_USER"), os.Getenv("DATABASE_PASSWORD"), os.Getenv("DATABASE_HOST"), os.Getenv("DATABASE_PORT"), os.Getenv("DATABASE_NAME"), os.Getenv("DATABASE_SSLMODE"))
 		default:
 			err := "Error Must be defined a database driver!"
 			fmt.Println(err)
