@@ -6,18 +6,21 @@ import (
 	"strings"
 
 	repositoriesDatabaseInterfaces "my-app/src/domain/repositories/database_interfaces"
-	productInputDTO "my-app/src/domain/input_dtos/products"
+	createDTO "my-app/src/domain/input_dtos/products/create"
+	listDTO "my-app/src/domain/input_dtos/products/list"
+	entities "my-app/src/domain/entities/products"
 )
 
 type ProductRepositoryInterface interface {
-	Insert(product productInputDTO.ProductInputDTO) error
+	Insert(product createDTO.CreateProductInputDTO) error
+	ListBy(filters listDTO.ListProductInputDTO) ([]entities.Product, error)
 }
 
 type ProductRepository struct {
 	db repositoriesDatabaseInterfaces.RepositoryDatabase
 }
 
-func (productRepository ProductRepository) Insert(productInputDTO productInputDTO.ProductInputDTO) error {
+func (productRepository ProductRepository) Insert(productInputDTO createDTO.CreateProductInputDTO) error {
 	_, err := productRepository.db.GetDB().Exec(
 		fmt.Sprintf("INSERT INTO products(identifier, full_name, state_name) VALUES (%s)", generateNPreparedStatementBindings(3)),
 		productInputDTO.Identifier,
@@ -32,6 +35,35 @@ func (productRepository ProductRepository) Insert(productInputDTO productInputDT
 
 	fmt.Println("ProductRepository::Insert executed successfully")
 	return nil
+}
+
+func (productRepository ProductRepository) ListBy(listInputDTO listDTO.ListProductInputDTO) ([]entities.Product, error) {
+	rows, err := productRepository.db.GetDB().Query("SELECT identifier, full_name, state_name FROM products")
+
+	if err != nil {
+		fmt.Println("Error in ProductRepository::ListBy. Error %v", err)
+		return nil, err
+	}
+
+	products := []entities.Product{}
+
+	for rows.Next() {
+		var product entities.Product
+
+		err = rows.Scan(&product.Identifier, &product.FullName, &product.StateName)
+
+		if err != nil {
+			msg := fmt.Sprintf("Error in ListBy::Scan. Error %v", err)
+			fmt.Println(msg)
+			return nil, err
+		}
+
+		products = append(products, product)
+	}
+
+	fmt.Println("ProductRepository::ListBy executed successfully")
+
+	return products, nil
 }
 
 func NewProductRepository(db repositoriesDatabaseInterfaces.RepositoryDatabase) ProductRepositoryInterface {

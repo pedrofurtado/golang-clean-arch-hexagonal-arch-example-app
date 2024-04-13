@@ -8,8 +8,10 @@ import (
 	"os"
 	"strconv"
 
+	useCases "my-app/src/domain/use_cases/products/list"
 	productRepository "my-app/src/domain/repositories/products"
-	productInputDTO "my-app/src/domain/input_dtos/products"
+	createInputDTO "my-app/src/domain/input_dtos/products/create"
+	listInputDTO "my-app/src/domain/input_dtos/products/list"
 
 	infraDatabaseDriver "my-app/src/infra/database_drivers"
 	infraHTTPRouter "my-app/src/infra/http_routers"
@@ -28,9 +30,17 @@ func main() {
 
 	////////////
 	db := infraDatabaseDriver.Init()
-	productInputDTO := productInputDTO.ProductInputDTO{Identifier: 1, FullName: "John smith", StateName: "ready",}
 	productRepository := productRepository.NewProductRepository(db)
-	productRepository.Insert(productInputDTO)
+
+	createProductInputDTO := createInputDTO.CreateProductInputDTO{Identifier: 1, FullName: "John smith", StateName: "ready",}
+	productRepository.Insert(createProductInputDTO)
+
+	listProductInputDTO := listInputDTO.ListProductInputDTO{Identifier: 1, FullName: "Headset", StateName: "ready"}
+	products, err := useCases.ListProductsUseCase(listProductInputDTO, productRepository)
+	if err != nil {
+		fmt.Println("Error when invoke ListProductsUseCase. Error ", err)
+	}
+	fmt.Println("Products from case use", products)
 	////////////
 
 	uuidGenerator := infraUUIDGenerator.Init()

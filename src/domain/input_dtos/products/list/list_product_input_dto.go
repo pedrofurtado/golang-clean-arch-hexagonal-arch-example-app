@@ -1,6 +1,6 @@
-package inputDTOs
+package input_dtos
 
-type ProductInputDTO struct {
+type ListProductInputDTO struct {
 	Identifier int
 	FullName string
 	StateName string
