@@ -11,7 +11,7 @@ docker container run -p 3000:80 -w /app -v $(pwd):/app --rm -it golang:1.22.2 go
 Localhost run
 
 ```bash
-docker container run -p 3000:80 -w /app -v $(pwd):/app --rm -it golang:1.22.2 go run init/app/main.go
+docker container run -p 3000:80 -w /app -v $(pwd):/app --rm -it golang:1.22.2 go run cmd/web/main.go
 ```
 
 Install new dependency

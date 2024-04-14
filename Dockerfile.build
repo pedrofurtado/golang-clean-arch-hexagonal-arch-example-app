@@ -1,0 +1,10 @@
+FROM golang:1.22.2 as Builder
+WORKDIR /app
+COPY . /app
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o binary-of-app /app/cmd/web
+
+FROM busybox:1.36.1
+WORKDIR /app
+COPY --from=Builder /app/binary-of-app /app
+CMD ["/app/binary-of-app"]
+EXPOSE 80
