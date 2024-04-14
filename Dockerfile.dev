@@ -1,5 +1,6 @@
 FROM golang:1.22.2
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash && apt-get install -y nodejs && node -v && npm -v && npm install -g nodemon@3.1.0
 WORKDIR /app
 COPY . /app
-CMD ["go", "run", "/app/cmd/web/main.go"]
+CMD ["nodemon", "-L", "--ext", "go,mod,sum,yml,yaml,sql,md,dev,prod,build", "--exec", "go run /app/cmd/web/main.go", "--signal", "SIGTERM"]
 EXPOSE 80
