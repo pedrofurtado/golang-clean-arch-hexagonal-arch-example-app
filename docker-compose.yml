@@ -8,8 +8,6 @@ services:
       POSTGRES_USER: my_db_user
       POSTGRES_DB: my_db
       POSTGRES_PASSWORD: my_db_password
-    volumes:
-      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
   db_in_mysql:
     restart: always
     image: mysql:5.7
@@ -18,20 +16,22 @@ services:
       MYSQL_USER: 'my_db_user'
       MYSQL_PASSWORD: 'my_db_password'
       MYSQL_ROOT_PASSWORD: 'my_db_root_password'
-    volumes:
-      - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
   app:
     restart: always
     volumes:
       - ./:/app
+    command: /bin/bash -c 'goose -allow-missing up && nodemon -L --ext "go,mod,sum" --exec "go run /app/cmd/web/main.go" --signal SIGTERM'
     build:
       context: .
       dockerfile: Dockerfile.dev
     environment:
       APP_PORT: 80
+      GOOSE_MIGRATION_DIR: /app/internal/infra/database_migrations/goose
       APP_ADAPTER_HTTP_ROUTER: gorilla_mux # Possible values: chi | gorilla_mux | julienschmidt_httprouter
       APP_ADAPTER_UUID_GENERATOR: gofrs_uuid # Possible values: google_uuid | gofrs_uuid (if blank: empty_uuid)
       APP_ADAPTER_DATABASE_DRIVER: postgres # Possible values: postgres | mysql
+      GOOSE_DRIVER: postgres # Possible values: postgres | mysql
+      GOOSE_DBSTRING: "host=db_in_postgres port=5432 user=my_db_user password=my_db_password dbname=my_db sslmode=disable" # Possible values: postgres (host=db_in_postgres port=5432 user=my_db_user password=my_db_password dbname=my_db sslmode=disable) | mysql (my_db_user:my_db_password@tcp(db_in_mysql:3306)/my_db?parseTime=true&multiStatements=true)
       DATABASE_HOST: "db_in_postgres"
       DATABASE_PORT: 5432
       DATABASE_NAME: my_db
