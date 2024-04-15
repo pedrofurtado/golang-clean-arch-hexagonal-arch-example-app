@@ -29,11 +29,11 @@ services:
       GOOSE_MIGRATION_DIR: /app/internal/infra/database_migrations/goose
       APP_ADAPTER_HTTP_ROUTER: gorilla_mux # Possible values: chi | gorilla_mux | julienschmidt_httprouter
       APP_ADAPTER_UUID_GENERATOR: gofrs_uuid # Possible values: google_uuid | gofrs_uuid (if blank: empty_uuid)
-      APP_ADAPTER_DATABASE_DRIVER: postgres # Possible values: postgres | mysql
-      GOOSE_DRIVER: postgres # Possible values: postgres | mysql
-      GOOSE_DBSTRING: "host=db_in_postgres port=5432 user=my_db_user password=my_db_password dbname=my_db sslmode=disable" # Possible values: postgres (host=db_in_postgres port=5432 user=my_db_user password=my_db_password dbname=my_db sslmode=disable) | mysql (my_db_user:my_db_password@tcp(db_in_mysql:3306)/my_db?parseTime=true&multiStatements=true)
-      DATABASE_HOST: "db_in_postgres"
-      DATABASE_PORT: 5432
+      APP_ADAPTER_DATABASE_DRIVER: mysql # Possible values: postgres | mysql
+      GOOSE_DRIVER: mysql # Possible values: postgres | mysql
+      GOOSE_DBSTRING: "my_db_user:my_db_password@tcp(db_in_mysql:3306)/my_db?parseTime=true&multiStatements=true" # Possible values: postgres (host=db_in_postgres port=5432 user=my_db_user password=my_db_password dbname=my_db sslmode=disable) | mysql (my_db_user:my_db_password@tcp(db_in_mysql:3306)/my_db?parseTime=true&multiStatements=true)
+      DATABASE_HOST: "db_in_mysql"
+      DATABASE_PORT: 3306
       DATABASE_NAME: my_db
       DATABASE_USER: my_db_user
       DATABASE_PASSWORD: my_db_password
