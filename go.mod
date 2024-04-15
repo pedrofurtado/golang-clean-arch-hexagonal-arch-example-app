@@ -9,6 +9,9 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
+	github.com/jsternberg/zap-logfmt v1.3.0 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
+	go.uber.org/zap v1.27.0 // indirect
 )

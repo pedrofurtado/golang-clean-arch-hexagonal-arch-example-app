@@ -13,12 +13,21 @@ import (
 	createInputDTO "my-app/internal/domain/input_dtos/products/create"
 	listInputDTO "my-app/internal/domain/input_dtos/products/list"
 
+	infraLogger "my-app/internal/infra/loggers"
+	infraLoggerInterfaces "my-app/internal/infra/loggers/interfaces"
 	infraDatabaseDriver "my-app/internal/infra/database_drivers"
 	infraHTTPRouter "my-app/internal/infra/http_routers"
 	infraUUIDGenerator "my-app/internal/infra/uuid_generators"
 )
 
 func main() {
+	additionalAttributes := infraLoggerInterfaces.GenericLoggerAdditionalAttributes{TransactionId: "xx-123", TraceId: "yy-899"}
+	logger := infraLogger.Init(os.Getenv("APP_ADAPTER_LOGGER_LEVEL"))
+	logger.Debug("blabla Debug", additionalAttributes)
+	logger.Info("blabla Info", additionalAttributes)
+	logger.Warning("blabla Warning", additionalAttributes)
+	logger.Error("blabla Error", additionalAttributes)
+
 	port, err := strconv.Atoi(os.Getenv("APP_PORT"))
 
 	if err != nil {

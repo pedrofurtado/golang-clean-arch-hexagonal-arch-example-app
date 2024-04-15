@@ -27,6 +27,8 @@ services:
     environment:
       APP_PORT: 80
       GOOSE_MIGRATION_DIR: /app/internal/infra/database_migrations/goose
+      APP_ADAPTER_LOGGER_LEVEL: debug # Possible values: debug | info | warn | error
+      APP_ADAPTER_LOGGER: zap # Possible values: standard | zap
       APP_ADAPTER_HTTP_ROUTER: gorilla_mux # Possible values: chi | gorilla_mux | julienschmidt_httprouter
       APP_ADAPTER_UUID_GENERATOR: gofrs_uuid # Possible values: google_uuid | gofrs_uuid (if blank: empty_uuid)
       APP_ADAPTER_DATABASE_DRIVER: mysql # Possible values: postgres | mysql
