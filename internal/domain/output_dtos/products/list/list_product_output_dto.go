@@ -5,5 +5,5 @@ import (
 )
 
 type ListProductOutputDTO struct {
-	Products []entities.Product
+	Products []entities.Product `json:"products"`
 }

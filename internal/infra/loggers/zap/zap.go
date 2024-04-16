@@ -16,22 +16,22 @@ type ZapLogger struct {
 
 func (s ZapLogger) Debug(text string, additionalAttributes loggerInterfaces.GenericLoggerAdditionalAttributes) {
 	defer s.logger.Sync()
-	s.logger.Debug(text, zap.String("transactionId", "123"))
+	s.logger.Debug(text, zap.String("transactionId", additionalAttributes.TransactionId), zap.String("traceId", additionalAttributes.TraceId))
 }
 
 func (s ZapLogger) Info(text string, additionalAttributes loggerInterfaces.GenericLoggerAdditionalAttributes) {
 	defer s.logger.Sync()
-	s.logger.Info(text)
+	s.logger.Info(text, zap.String("transactionId", additionalAttributes.TransactionId), zap.String("traceId", additionalAttributes.TraceId))
 }
 
 func (s ZapLogger) Warning(text string, additionalAttributes loggerInterfaces.GenericLoggerAdditionalAttributes) {
 	defer s.logger.Sync()
-	s.logger.Warn(text)
+	s.logger.Warn(text, zap.String("transactionId", additionalAttributes.TransactionId), zap.String("traceId", additionalAttributes.TraceId))
 }
 
 func (s ZapLogger) Error(text string, additionalAttributes loggerInterfaces.GenericLoggerAdditionalAttributes) {
 	defer s.logger.Sync()
-	s.logger.Error(text)
+	s.logger.Error(text, zap.String("transactionId", additionalAttributes.TransactionId), zap.String("traceId", additionalAttributes.TraceId))
 }
 
 func Init(logLevel string) ZapLogger {

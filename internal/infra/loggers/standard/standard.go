@@ -8,24 +8,24 @@ import (
 	loggerInterfaces "my-app/internal/infra/loggers/interfaces"
 )
 
-type StandardLogger struct{
+type StandardLogger struct {
 	logger *slog.Logger
 }
 
 func (s StandardLogger) Debug(text string, additionalAttributes loggerInterfaces.GenericLoggerAdditionalAttributes) {
-	s.logger.Debug(text)
+	s.logger.Debug(text, "transactionId", additionalAttributes.TransactionId, "traceId", additionalAttributes.TraceId)
 }
 
 func (s StandardLogger) Info(text string, additionalAttributes loggerInterfaces.GenericLoggerAdditionalAttributes) {
-	s.logger.Info(text)
+	s.logger.Info(text, "transactionId", additionalAttributes.TransactionId, "traceId", additionalAttributes.TraceId)
 }
 
 func (s StandardLogger) Warning(text string, additionalAttributes loggerInterfaces.GenericLoggerAdditionalAttributes) {
-	s.logger.Warn(text)
+	s.logger.Warn(text, "transactionId", additionalAttributes.TransactionId, "traceId", additionalAttributes.TraceId)
 }
 
 func (s StandardLogger) Error(text string, additionalAttributes loggerInterfaces.GenericLoggerAdditionalAttributes) {
-	s.logger.Error(text)
+	s.logger.Error(text, "transactionId", additionalAttributes.TransactionId, "traceId", additionalAttributes.TraceId)
 }
 
 func Init(logLevel string) StandardLogger {
