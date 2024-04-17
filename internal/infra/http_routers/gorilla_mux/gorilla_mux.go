@@ -4,11 +4,15 @@ import (
 	"os"
 	"fmt"
 	"net/http"
+	"net/url"
+	"encoding/json"
+
 	"context"
 
 	"github.com/gorilla/mux"
 
 	facade "my-app/internal/domain/facades/products"
+	infraHTTPClient "my-app/internal/infra/http_clients"
 	infraUUIDGenerator "my-app/internal/infra/uuid_generators"
 	infraLogger "my-app/internal/infra/loggers"
 	infraLoggerInterfaces "my-app/internal/infra/loggers/interfaces"
@@ -46,7 +50,34 @@ func contentTypeApplicationJsonMiddleware(next http.Handler) http.Handler {
 }
 
 func homeRoute(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(fmt.Sprintf("welcome from gorilla mux | Request ID %s", r.Context().Value("my-app-request-id"))))
+	logger := infraLogger.Init(os.Getenv("APP_ADAPTER_LOGGER_LEVEL"))
+	additionalAttributes := infraLoggerInterfaces.GenericLoggerAdditionalAttributes{TransactionId: r.Context().Value("my-app-request-id").(string), TraceId: ""}
+	infraHTTPClientAdapter := infraHTTPClient.Init(logger, additionalAttributes)
+
+	requestURL := "https://jsonplaceholder.typicode.com/posts/2"
+	bodyParams := map[string]string{
+		"MybodyParam1": "value1",
+		"MybodyParam2": "value2",
+	}
+	headerParams := map[string]string{
+		"X-MY-HEADER-ONE-FAKE-TEST": "value1",
+		"X-MY-HEADER-TWO-FAKE-TEST": "value2",
+	}
+	queryParams := url.Values{}
+	queryParams.Add("Queryparam1", "value1")
+	queryParams.Add("Queryparam2", "value2")
+	timeoutParam := 1
+
+	parsedResponseJson, statusCode, err := infraHTTPClientAdapter.Get(requestURL, bodyParams, queryParams, headerParams, timeoutParam)
+
+	parsedResponseJson["app-request-id"] = r.Context().Value("my-app-request-id")
+	fmt.Printf("Result of HTTP request: Status %v with Body `%v`\n", statusCode, parsedResponseJson)
+	resAsJsonString, err := json.Marshal(parsedResponseJson)
+	if err != nil {
+			fmt.Println("Error on json marshal", err)
+	}
+
+	w.Write([]byte(string(resAsJsonString)))
 }
 
 func listProductsRoute(w http.ResponseWriter, r *http.Request) {
