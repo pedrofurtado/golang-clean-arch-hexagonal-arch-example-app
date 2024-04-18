@@ -17,9 +17,11 @@ import (
 	infraLogger "my-app/internal/infra/loggers"
 	infraLoggerInterfaces "my-app/internal/infra/loggers/interfaces"
 	listInputDTO "my-app/internal/domain/input_dtos/products/list"
+	createInputDTO "my-app/internal/domain/input_dtos/products/create"
 	repository "my-app/internal/domain/repositories/products"
 	infraDatabaseDriver "my-app/internal/infra/database_drivers"
 	listPresenters "my-app/internal/domain/presenters/products/list"
+	createPresenters "my-app/internal/domain/presenters/products/create"
 )
 
 func Init(uuidGenerator infraUUIDGenerator.GenericUUIDGenerator, logger infraLogger.GenericLogger, loggerAdditionalAttributes infraLoggerInterfaces.GenericLoggerAdditionalAttributes) http.Handler {
@@ -28,6 +30,7 @@ func Init(uuidGenerator infraUUIDGenerator.GenericUUIDGenerator, logger infraLog
 	r.Use(contentTypeApplicationJsonMiddleware)
 	r.HandleFunc("/", homeRoute).Methods("GET")
 	r.HandleFunc("/products", listProductsRoute).Methods("GET")
+	r.HandleFunc("/products", createProductRoute).Methods("POST")
 	r.HandleFunc("/products/{productId}", findProductRoute).Methods("GET")
 
 	return r
@@ -94,6 +97,27 @@ func listProductsRoute(w http.ResponseWriter, r *http.Request) {
 	presenter := listPresenters.NewListProductPresenter(logger, additionalAttributes)
 
 	w.Write([]byte(presenter.ToJSON(productsOutputDTO)))
+}
+
+func createProductRoute(w http.ResponseWriter, r *http.Request) {
+	db := infraDatabaseDriver.Init()
+	productRepository := repository.NewProductRepository(db)
+	logger := infraLogger.Init(os.Getenv("APP_ADAPTER_LOGGER_LEVEL"))
+	additionalAttributes := infraLoggerInterfaces.GenericLoggerAdditionalAttributes{TransactionId: r.Context().Value("my-app-request-id").(string), TraceId: ""}
+
+	productFacade := facade.NewProductFacade(productRepository, logger, additionalAttributes)
+
+	var inputDTO createInputDTO.CreateProductInputDTO
+
+	err := json.NewDecoder(r.Body).Decode(&inputDTO)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf("Error on JSON parse | %v", err)))
+	}
+	createProductOutputDTO, _ := productFacade.CreateProduct(inputDTO)
+
+	presenter := createPresenters.NewCreateProductPresenter(logger, additionalAttributes)
+
+	w.Write([]byte(presenter.ToJSON(createProductOutputDTO)))
 }
 
 func findProductRoute(w http.ResponseWriter, r *http.Request) {

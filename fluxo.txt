@@ -1,0 +1,32 @@
+
+Ponto de partida:
+  CMD/web/main.go
+                |___-> Init dependencies
+                |
+                |___-> Database migrations
+                |
+                |___-> Logger
+                            |___-> Logger adapter
+                |
+                |___-> UUID generator
+                            |___-> UUID generator adapter
+                |
+                |___-> Start Web Server -> internal/infra/http_routers/http_router.go
+                                                                                    |
+                                                                                    |___->         CHI |
+                                                                                    |___-> Gorilla MUX |
+                                                                                    |___->      Julien |
+                                                                                                       |___-> Route Handler (controller + action)
+                                                                                                                                                |___-> Input DTO
+                                                                                                                                                |___-> Output DTO
+                                                                                                                                                |___-> Presenter
+                                                                                                                                                |___-> Unit of Work (transactions)
+                                                                                                                                                |___-> Facade
+                                                                                                                                                              |
+                                                                                                                                                              |___-> Use Case
+                                                                                                                                                                            |___-> HTTP Client
+                                                                                                                                                                                            |___-> HTTP client adapter
+                                                                                                                                                                            |___-> Entities
+                                                                                                                                                                            |___-> Repository
+                                                                                                                                                                                            |___-> DB driver
+                                                                                                                                                                                                          |___-> DB driver adapter

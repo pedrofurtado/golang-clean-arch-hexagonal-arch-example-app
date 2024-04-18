@@ -12,7 +12,7 @@ import (
 )
 
 type ProductRepositoryInterface interface {
-	Insert(product createDTO.CreateProductInputDTO) error
+	Insert(product createDTO.CreateProductInputDTO) ([]entities.Product, error)
 	ListBy(filters listDTO.ListProductInputDTO) ([]entities.Product, error)
 }
 
@@ -20,21 +20,23 @@ type ProductRepository struct {
 	db repositoriesDatabaseInterfaces.RepositoryDatabase
 }
 
-func (productRepository ProductRepository) Insert(productInputDTO createDTO.CreateProductInputDTO) error {
-	_, err := productRepository.db.GetDB().Exec(
+func (productRepository ProductRepository) Insert(productInputDTO createDTO.CreateProductInputDTO) ([]entities.Product, error) {
+	result, err := productRepository.db.GetDB().Exec(
 		fmt.Sprintf("INSERT INTO products(identifier, full_name, state_name) VALUES (%s)", generateNPreparedStatementBindings(3)),
 		productInputDTO.Identifier,
 		productInputDTO.FullName,
 		productInputDTO.StateName,
 	)
 
+	fmt.Println("result of query: %v", result)
+
 	if err != nil {
 		fmt.Println("Error in ProductRepository::Insert. Error %v", err)
-		return err
+		return []entities.Product{}, err
 	}
 
 	fmt.Println("ProductRepository::Insert executed successfully")
-	return nil
+	return []entities.Product{}, nil
 }
 
 func (productRepository ProductRepository) ListBy(listInputDTO listDTO.ListProductInputDTO) ([]entities.Product, error) {
